@@ -3,13 +3,13 @@ const BOARD_HEIGHT = 20;
 const BLOCK_SIZE = 30;
 
 const TETROMINOS = {
-    'I': { shape: [[0,0,0,0], [1,1,1,1], [0,0,0,0], [0,0,0,0]], color: 'type-I' },
-    'J': { shape: [[1,0,0], [1,1,1], [0,0,0]], color: 'type-J' },
-    'L': { shape: [[0,0,1], [1,1,1], [0,0,0]], color: 'type-L' },
-    'O': { shape: [[1,1], [1,1]], color: 'type-O' },
-    'S': { shape: [[0,1,1], [1,1,0], [0,0,0]], color: 'type-S' },
-    'T': { shape: [[0,1,0], [1,1,1], [0,0,0]], color: 'type-T' },
-    'Z': { shape: [[1,1,0], [0,1,1], [0,0,0]], color: 'type-Z' }
+    'I': { shape: [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], color: 'type-I' },
+    'J': { shape: [[1, 0, 0], [1, 1, 1], [0, 0, 0]], color: 'type-J' },
+    'L': { shape: [[0, 0, 1], [1, 1, 1], [0, 0, 0]], color: 'type-L' },
+    'O': { shape: [[1, 1], [1, 1]], color: 'type-O' },
+    'S': { shape: [[0, 1, 1], [1, 1, 0], [0, 0, 0]], color: 'type-S' },
+    'T': { shape: [[0, 1, 0], [1, 1, 1], [0, 0, 0]], color: 'type-T' },
+    'Z': { shape: [[1, 1, 0], [0, 1, 1], [0, 0, 0]], color: 'type-Z' }
 };
 
 let grid = Array(BOARD_HEIGHT).fill().map(() => Array(BOARD_WIDTH).fill(null));
@@ -62,7 +62,7 @@ function spawnPiece() {
         currentPiece = createPiece();
     }
     nextPiece = createPiece();
-    
+
     // Position at top center
     currentPiece.x = Math.floor(BOARD_WIDTH / 2) - Math.floor(currentPiece.shape[0].length / 2);
     currentPiece.y = 0;
@@ -120,13 +120,13 @@ function rotate() {
     );
     const previousShape = currentPiece.shape;
     currentPiece.shape = rotated;
-    
+
     // Basic wall kick (try sticking to bounds)
     if (checkCollision(0, 0)) {
         // Try shifting left
         if (!checkCollision(-1, 0)) {
             currentPiece.x -= 1;
-        } 
+        }
         // Try shifting right
         else if (!checkCollision(1, 0)) {
             currentPiece.x += 1;
@@ -207,7 +207,7 @@ function updateScore() {
 function handleInput(e) {
     if (isGameOver || !currentPiece) return;
 
-    switch(e.keyCode) {
+    switch (e.keyCode) {
         case 37: // Left
             move(-1);
             break;
@@ -229,7 +229,7 @@ function handleInput(e) {
 // Rendering
 function renderGrid() {
     gameBoard.innerHTML = '';
-    
+
     // Render static grid
     for (let y = 0; y < BOARD_HEIGHT; y++) {
         for (let x = 0; x < BOARD_WIDTH; x++) {
@@ -247,9 +247,9 @@ function renderFrame() {
     // Much more efficient to just re-render classes on existing divs
     // But for simplicity/robustness in vanilla JS, we can just clear/redraw
     // Optimization: Don't recreate divs, just update classes
-    
+
     const cells = document.getElementsByClassName('cell');
-    
+
     // Clear dynamic pieces from view (maintain static grid)
     for (let y = 0; y < BOARD_HEIGHT; y++) {
         for (let x = 0; x < BOARD_WIDTH; x++) {
@@ -286,7 +286,7 @@ function renderFrame() {
 function renderNextPiece() {
     nextPieceDisplay.innerHTML = '';
     if (!nextPiece) return;
-    
+
     // Center the piece in 4x4 grid
     const offsetX = Math.floor((4 - nextPiece.shape[0].length) / 2);
     const offsetY = Math.floor((4 - nextPiece.shape.length) / 2);
@@ -295,11 +295,11 @@ function renderNextPiece() {
         for (let x = 0; x < 4; x++) {
             const cell = document.createElement('div');
             cell.classList.add('cell');
-            
+
             // Check if this coordinate maps to a block in the shape
             const shapeY = y - offsetY;
             const shapeX = x - offsetX;
-            
+
             if (shapeY >= 0 && shapeY < nextPiece.shape.length &&
                 shapeX >= 0 && shapeX < nextPiece.shape[shapeY].length &&
                 nextPiece.shape[shapeY][shapeX]) {
@@ -309,5 +309,29 @@ function renderNextPiece() {
         }
     }
 }
+
+// --- Tab Switching Logic ---
+const tabs = document.querySelectorAll('.tab-btn');
+const contents = document.querySelectorAll('.tab-content');
+
+tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        // Remove active class from all
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+
+        // Add active class to clicked
+        tab.classList.add('active');
+        const targetId = tab.getAttribute('data-tab');
+        document.getElementById(targetId).classList.add('active');
+
+        // Optional: Pause game if not on game tab
+        if (targetId !== 'game') {
+            isPaused = true;
+        } else {
+            if (!isGameOver && gameLoop) isPaused = false;
+        }
+    });
+});
 
 init();
