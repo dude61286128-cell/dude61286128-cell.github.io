@@ -182,6 +182,11 @@ function clearLines() {
     let linesCleared = 0;
     for (let y = BOARD_HEIGHT - 1; y >= 0; y--) {
         if (grid[y].every(cell => cell !== null)) {
+            // Trigger Explosion
+            for (let x = 0; x < BOARD_WIDTH; x++) {
+                spawnExplosion(x, y, grid[y][x]);
+            }
+
             grid.splice(y, 1);
             grid.unshift(Array(BOARD_WIDTH).fill(null));
             linesCleared++;
@@ -196,6 +201,36 @@ function clearLines() {
         clearInterval(gameLoop);
         gameLoop = setInterval(update, dropInterval);
         updateScore();
+    }
+}
+
+function spawnExplosion(x, y, colorClass) {
+    const particleCount = 12;
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('explosion-particle', colorClass);
+
+        // Position centering (relative to game board)
+        const left = x * BLOCK_SIZE + BLOCK_SIZE / 2;
+        const top = y * BLOCK_SIZE + BLOCK_SIZE / 2;
+        particle.style.left = `${left}px`;
+        particle.style.top = `${top}px`;
+
+        // Random direction
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = 20 + Math.random() * 60; // Distance to travel
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+
+        particle.style.setProperty('--tx', `${tx}px`);
+        particle.style.setProperty('--ty', `${ty}px`);
+
+        gameBoard.appendChild(particle);
+
+        // Cleanup
+        setTimeout(() => {
+            particle.remove();
+        }, 800);
     }
 }
 
