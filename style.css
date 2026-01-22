@@ -100,7 +100,8 @@ main {
     animation: fadeUp 0.5s ease-out forwards;
 }
 
-#tool1.tab-content {
+#tool1.tab-content,
+#game.tab-content {
     max-width: 100%;
 }
 
@@ -512,7 +513,7 @@ main {
     left: 20px;
     background: transparent;
     border: none;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     color: var(--text-secondary);
     cursor: pointer;
     font-weight: 600;
