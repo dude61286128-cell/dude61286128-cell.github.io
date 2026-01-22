@@ -260,13 +260,13 @@ document.addEventListener('keydown', (e) => {
 // Role Dice Tool Logic
 let isSpinning = false;
 const cube = document.querySelector('.cube');
+// Updated roles based on user input for Roulette (assuming these are the intended "1in1roles")
 const roles = [
-    { name: "리더", desc: "모둠 활동을 이끌고 의견을 정리합니다." },
-    { name: "기록이", desc: "활동 내용과 결과를 기록합니다." },
-    { name: "시간이", desc: "활동 시간을 관리하고 알려줍니다." },
-    { name: "나눔이", desc: "준비물을 챙기고 정리정돈을 담당합니다." },
-    { name: "발표이", desc: "모둠의 의견을 대표로 발표합니다." },
-    { name: "칭찬이", desc: "친구들의 장점을 찾아 칭찬해줍니다." }
+    { name: "손님모셔오기", desc: "즐거운 교실놀이입니다." },
+    { name: "이런 사람 일어나", desc: "즐거운 교실놀이입니다." },
+    { name: "유령기차", desc: "즐거운 교실놀이입니다." },
+    { name: "릴레이 박수", desc: "즐거운 교실놀이입니다." },
+    { name: "가가볼", desc: "즐거운 교실놀이입니다." }
 ];
 
 function rollDice() {
@@ -289,7 +289,8 @@ function rollDice() {
         const selectedRole = roles[randomIndex];
 
         // Apply a random final rotation (CSS) to make it look like it landed
-        const xRand = Math.floor(Math.random() * 4) * 90;
+        // Constrain X rotation to 0 to keep it upright as requested
+        const xRand = 0;
         const yRand = Math.floor(Math.random() * 4) * 90;
         cube.style.transform = `translateZ(-150px) rotateX(${xRand}deg) rotateY(${yRand}deg)`;
 
@@ -347,7 +348,8 @@ function spinRoulette() {
         const effectiveAngle = (360 - actualDeg) % 360;
         const segmentSize = 72; // 360 / 5
 
-        const winningIndex = Math.floor(effectiveAngle / segmentSize);
+        // Adjustment: Visual offset +1 index
+        const winningIndex = (Math.floor(effectiveAngle / segmentSize) + 1) % 5;
         // winningIndex 0 -> Segment 1
 
         const items = ['손님모셔오기', '이런 사람 일어나', '유령기차', '릴레이 박수', '가가볼'];
