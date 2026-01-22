@@ -1058,8 +1058,8 @@ main {
 /* Roulette Wheel Styles */
 .roulette-container {
     position: relative;
-    width: 400px;
-    height: 400px;
+    width: 600px;
+    height: 600px;
     margin: 20px auto;
     display: flex;
     justify-content: center;
@@ -1130,7 +1130,7 @@ main {
     bottom: 50%;
     right: 50%;
     transform-origin: bottom right;
-    transform: skewY(18deg) rotate(36deg) translate(80px);
+    transform: skewY(18deg) rotate(36deg) translate(130px);
     /* adjusted translate for centering */
     text-align: center;
     /* Center text in its box */
