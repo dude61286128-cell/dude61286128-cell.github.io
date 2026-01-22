@@ -900,44 +900,44 @@ main {
     right: -5px;
 }
 
-/* Yellow Bird (Triangle-ish) */
+/* Yellow Bird (Rounded) */
 .bird-yellow {
-    width: 0;
-    height: 0;
-    border-left: 25px solid transparent;
-    border-right: 25px solid transparent;
-    border-bottom: 50px solid #ffd700;
+    width: 45px;
+    height: 45px;
+    background: #ffd700;
+    border-radius: 50%;
+    /* Fully round */
     top: 40%;
     right: -100px;
-    /* Start from right */
     animation: flyLeft 12s linear infinite;
     animation-delay: 5s;
+    box-shadow: inset -5px -5px 10px rgba(0, 0, 0, 0.1);
 }
 
 .bird-yellow .wing {
     position: absolute;
-    width: 15px;
-    height: 10px;
+    width: 18px;
+    height: 12px;
     background: #e6c200;
     border-radius: 50%;
-    top: 5px;
-    /* relative to the 0x0 box, positioned manually */
-    left: -15px;
-    transform-origin: top left;
+    top: 25px;
+    right: 15px;
+    /* Positioned on body */
+    transform-origin: top right;
     animation: flap 0.2s ease-in-out infinite alternate;
 }
 
-/* For the yellow bird features, we use a wrapper or trick, but for simplicity applying simple shapes relative to position */
 .bird-yellow::before {
     /* Eye */
     content: '';
     position: absolute;
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     background: white;
     border-radius: 50%;
-    top: 15px;
-    left: -6px;
+    top: 10px;
+    left: 5px;
+    /* Facing left */
     border: 2px solid #000;
     /* Pupil */
     background-image: radial-gradient(circle at 40% 60%, black 2px, transparent 3px);
@@ -949,12 +949,12 @@ main {
     position: absolute;
     width: 0;
     height: 0;
-    border-top: 4px solid transparent;
-    border-bottom: 4px solid transparent;
-    border-right: 8px solid #ff6600;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-right: 10px solid #ff6600;
     /* Pointing left */
-    top: 28px;
-    left: -12px;
+    top: 20px;
+    left: -8px;
 }
 
 /* Blue Bird (Small Circle) */
@@ -1052,3 +1052,108 @@ main {
 
     /* Simple flap effect */
 }
+/* Roulette Wheel Styles */
+.roulette-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    margin: 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.roulette-wheel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 10px solid #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1); /* Ease-out stopping */
+}
+
+/* 5 Segments: Each 360/5 = 72deg */
+.segment {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    background: var(--clr);
+    transform-origin: bottom right;
+    top: 0;
+    left: 0;
+    transform: rotate(calc(72deg * (var(--i) - 1)));
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 0); /* This clip path is tricky for general pie slices. */
+    /* Better approach for generic sectors using conic-gradient or skew, but here let's try a simpler geometric approach */
+    /* Actually for 5 items, clip-path polygon is hard. Let's use the conic-gradient method on the parent if possible, 
+       but we need text labels. 
+       Let's stick to rotate & skewY for sectors. 
+       72deg sector. skewY = 90 - 72 = 18deg.
+    */
+    transform: rotate(calc(72deg * (var(--i) - 1))) skewY(-18deg);
+    /* Correct origin is bottom right */
+}
+
+/* Fix segment shape attempt 2: Using standard circular sector method */
+/* 
+   Each segment is a box rooted at center.
+   transform-origin: 100% 100%; 
+   rotate: ...
+   skewY: ...
+*/
+
+.segment {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 50%;
+    background: var(--clr);
+    transform-origin: 100% 100%;
+    transform: rotate(calc(72deg * (var(--i) - 1))) skewY(-18deg); /* 90 - 72 = 18 */
+    border: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.segment span {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    transform: skewY(18deg) rotate(36deg) translate(80px); /* Counter skew and better placement */
+    transform-origin: center;
+    text-align: right;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    width: 150px;
+}
+
+.pointer {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 30px solid #ff3e3e;
+    z-index: 10;
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));
+}
+.pointer::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ff3e3e;
+    top: -35px;
+    left: -5px;
+}
+

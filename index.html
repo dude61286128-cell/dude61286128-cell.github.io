@@ -65,9 +65,9 @@
 
                 <div class="project-card" style="margin-top: 30px;">
                     <div class="card-content">
-                        <h3>학급도구2</h3>
+                        <h3>학급도구2: 교실놀이 돌림판</h3>
                         <p>학생들과 함께하는 즐거운 활동 도구입니다.</p>
-                        <button class="play-btn" onclick="alert('준비 중입니다!')">실행</button>
+                        <button class="play-btn" onclick="openTool2()">실행</button>
                     </div>
                 </div>
             </section>
@@ -151,6 +151,32 @@
         </div>
     </div>
 
+    <!-- CLASS TOOL 2 SECTION (Roulette) -->
+    <div id="tool2" class="tab-content">
+        <div class="tool-wrapper">
+            <button class="back-btn" onclick="goHome()">← Back to Home</button>
+            <h2>교실놀이 돌림판</h2>
+            <p>돌림판을 클릭해서 오늘의 놀이를 정해보세요!</p>
+
+            <div class="roulette-container">
+                <div class="pointer"></div>
+                <div class="roulette-wheel" id="roulette-wheel" onclick="spinRoulette()">
+                    <div class="segment" style="--i:1; --clr:#FF6384;"><span>손님모셔오기</span></div>
+                    <div class="segment" style="--i:2; --clr:#36A2EB;"><span>이런 사람 일어나</span></div>
+                    <div class="segment" style="--i:3; --clr:#FFCE56;"><span>유령기차</span></div>
+                    <div class="segment" style="--i:4; --clr:#4BC0C0;"><span>릴레이 박수</span></div>
+                    <div class="segment" style="--i:5; --clr:#9966FF;"><span>가가볼</span></div>
+                </div>
+            </div>
+
+            <div id="roulette-result" class="role-result hidden">
+                <h3>당첨!</h3>
+                <p id="roulette-winner"></p>
+                <button class="retry-btn" onclick="resetRoulette()">다시 돌리기</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
     <script>
         function switchToGame() {
@@ -174,13 +200,22 @@
         function openTool1() {
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-
             // Show tool1
             const tool1 = document.getElementById('tool1');
             if (tool1) {
                 tool1.classList.add('active');
                 resetDice(); // Reset state when opening
+            }
+        }
+
+        function openTool2() {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            // Show tool2
+            const tool2 = document.getElementById('tool2');
+            if (tool2) {
+                tool2.classList.add('active');
+                resetRoulette();
             }
         }
     </script>

@@ -426,3 +426,83 @@ function resetDice() {
 }
 
 init();
+
+/* Roulette Logic */
+let currentRotation = 0;
+
+function spinRoulette() {
+    const wheel = document.getElementById('roulette-wheel');
+    const resultDiv = document.getElementById('roulette-result');
+    const winnerText = document.getElementById('roulette-winner');
+    
+    // Hide previous result
+    resultDiv.classList.add('hidden');
+    resultDiv.classList.remove('active');
+
+    // Calculate random spin
+    // Minimum 5 full spins (1800 deg) + random angle
+    const randomDegree = Math.floor(Math.random() * 360);
+    const extraSpins = 360 * 5; 
+    const totalRotation = currentRotation + extraSpins + randomDegree;
+    
+    // Rotate
+    wheel.style.transform = 'rotate(' + totalRotation + 'deg)';
+    currentRotation = totalRotation;
+
+    // Determine winner after animation (5s)
+    setTimeout(() => {
+        // Calculate the actual angle in 0-360 range
+        // We need to account for the pointer being at the top (0 degrees or 270/90 depending on init).
+        // Our segments start at 0 (top-left if unskewed? No, let's trace).
+        // Segment 1: 0deg. Top-left quadrant before skew... this geometry is tricky.
+        
+        // Easier: visual mapping.
+        // The rotation is clockwise. The pointer is at TOP.
+        // So the winning segment is the one that lands at the TOP.
+        // Landing Angle = (360 - (totalRotation % 360)) % 360.
+        
+        const actualDeg = totalRotation % 360;
+        // Pointer is at Top (0 deg relative to wheel if wheel wasn't rotated, but wheel rotates CW)
+        // If wheel rotates 10 deg, 350 deg point is at top.
+        // So index is determined by checking what range covers 360-actualDeg.
+        
+        const effectiveAngle = (360 - actualDeg) % 360;
+        const segmentSize = 72; // 360 / 5
+        
+        // Items order in DOM: 1, 2, 3, 4, 5
+        // DOM Rotations: 0, 72, 144, 216, 288
+        // Segment 1 covers [0, 72)
+        // Segment 2 covers [72, 144) ... etc.
+        
+        // BUT, our segments are skewed.
+        // Segment 1 (Pink) starts at 0 deg (12 o'clock approx after transform adjustments).
+        // Due to skew/rotation setup, center of Segment 1 is roughly at 36 deg?
+        // Let's rely on standard calculation: Floor(angle / 72)
+        
+        // Adjust for potential offset due to skew logic:
+        // SkewY(-18) means the visual block is squished. 
+        // Start edge is at 0. End edge is at 72.
+        
+        const winningIndex = Math.floor(effectiveAngle / segmentSize);
+        // winningIndex 0 -> Segment 1
+        // winningIndex 1 -> Segment 2 ...
+        
+        const items = ['손님모셔오기', '이런 사람 일어나', '유령기차', '릴레이 박수', '가가볼'];
+        // Note: The segments are rendered in order 1..5.
+        // Segment 1 starts at 0 deg.
+        
+        const winner = items[winningIndex];
+
+        winnerText.textContent = winner;
+        resultDiv.classList.remove('hidden');
+        resultDiv.classList.add('active'); // Reuse active animation
+        
+    }, 5000);
+}
+
+function resetRoulette() {
+    const resultDiv = document.getElementById('roulette-result');
+    resultDiv.classList.add('hidden');
+    spinRoulette();
+}
+
