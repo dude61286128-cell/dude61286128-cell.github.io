@@ -1,10 +1,14 @@
-﻿
-// Tab Switching Logic
+﻿// Tab Switching Logic
 document.querySelectorAll('.tab-btn').forEach(button => {
     button.addEventListener('click', () => {
+        // Remove active class from all buttons and contents
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+        // Add active class to clicked button
         button.classList.add('active');
+
+        // Show corresponding content
         const tabId = button.getAttribute('data-tab');
         document.getElementById(tabId).classList.add('active');
     });
@@ -29,6 +33,7 @@ let isPaused = false;
 let currentPiece;
 let nextPiece;
 
+// Tetromino Shapes
 const SHAPES = {
     I: [[1, 1, 1, 1]],
     O: [[1, 1], [1, 1]],
@@ -63,9 +68,9 @@ function drawBoard() {
             if (value) {
                 const block = document.createElement('div');
                 block.classList.add('cell', 'block', value);
-                block.style.top = \\px\;
-                block.style.left = \\px\;
-                block.style.position = 'absolute';
+                block.style.top = `${y * BLOCK_SIZE}px`;
+                block.style.left = `${x * BLOCK_SIZE}px`;
+                block.style.position = 'absolute'; // Ensure absolute positioning
                 board.appendChild(block);
             }
         });
@@ -77,8 +82,8 @@ function drawBoard() {
                 if (value) {
                     const block = document.createElement('div');
                     block.classList.add('cell', 'block', currentPiece.color);
-                    block.style.top = \\px\;
-                    block.style.left = \\px\;
+                    block.style.top = `${(currentPiece.y + dy) * BLOCK_SIZE}px`;
+                    block.style.left = `${(currentPiece.x + dx) * BLOCK_SIZE}px`;
                     block.style.position = 'absolute';
                     board.appendChild(block);
                 }
@@ -90,6 +95,8 @@ function drawBoard() {
 function drawNextPiece() {
     nextPieceElement.innerHTML = '';
     if (!nextPiece) return;
+
+    // Calculate offset to center the piece
     const offsetX = (4 - nextPiece.shape[0].length) / 2;
     const offsetY = (4 - nextPiece.shape.length) / 2;
 
@@ -129,7 +136,7 @@ function rotatePiece() {
     const prevShape = currentPiece.shape;
     currentPiece.shape = rotatedShape;
     if (!isValidMove(currentPiece, 0, 0)) {
-        currentPiece.shape = prevShape;
+        currentPiece.shape = prevShape; // Revert if invalid
     }
 }
 
@@ -156,15 +163,19 @@ function checkLines() {
     let linesCleared = 0;
     for (let y = ROWS - 1; y >= 0; y--) {
         if (grid[y].every(cell => cell !== 0)) {
+            // Remove line
             grid.splice(y, 1);
+            // Add new empty line at top
             grid.unshift(Array(COLS).fill(0));
             linesCleared++;
-            y++;
+            y++; // Check same row index again as lines shifted down
+
+            // Explosion effect for cleared line
             createExplosion(y * BLOCK_SIZE);
         }
     }
     if (linesCleared > 0) {
-        score += linesCleared * 100 * linesCleared;
+        score += linesCleared * 100 * linesCleared; // Bonus for multiple lines
         scoreElement.textContent = score;
         if (score > level * 500) {
             level++;
@@ -176,14 +187,15 @@ function checkLines() {
 }
 
 function createExplosion(yPos) {
+    // Simple particle effect
     for (let i = 0; i < 20; i++) {
         const particle = document.createElement('div');
         particle.classList.add('explosion-particle');
-        particle.style.left = \\px\;
-        particle.style.top = \\px\;
-        particle.style.background = \hsl(\, 100 %, 50 %) \;
-        particle.style.setProperty('--tx', \\px\);
-        particle.style.setProperty('--ty', \\px\);
+        particle.style.left = `${Math.random() * 300}px`;
+        particle.style.top = `${yPos}px`;
+        particle.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        particle.style.setProperty('--tx', `${(Math.random() - 0.5) * 100}px`);
+        particle.style.setProperty('--ty', `${(Math.random() - 0.5) * 100}px`);
         board.appendChild(particle);
         setTimeout(() => particle.remove(), 800);
     }
@@ -226,7 +238,7 @@ if (startBtn) {
 }
 
 document.addEventListener('keydown', (e) => {
-    if (!currentPiece || startBtn.disabled === false) return;
+    if (!currentPiece || startBtn.disabled === false) return; // Only control when playing
 
     if (e.key === 'ArrowLeft') {
         if (isValidMove(currentPiece, -1, 0)) currentPiece.x--;
@@ -249,12 +261,12 @@ document.addEventListener('keydown', (e) => {
 let isSpinning = false;
 const cube = document.querySelector('.cube');
 const roles = [
-    { name: '리더', desc: '모둠 활동을 이끌고 의견을 정리합니다.' },
-    { name: '기록이', desc: '활동 내용과 결과를 기록합니다.' },
-    { name: '시간이', desc: '활동 시간을 관리하고 알려줍니다.' },
-    { name: '나눔이', desc: '준비물을 챙기고 정리정돈을 담당합니다.' },
-    { name: '발표이', desc: '모둠의 의견을 대표로 발표합니다.' },
-    { name: '칭찬이', desc: '친구들의 장점을 찾아 칭찬해줍니다.' }
+    { name: "리더", desc: "모둠 활동을 이끌고 의견을 정리합니다." },
+    { name: "기록이", desc: "활동 내용과 결과를 기록합니다." },
+    { name: "시간이", desc: "활동 시간을 관리하고 알려줍니다." },
+    { name: "나눔이", desc: "준비물을 챙기고 정리정돈을 담당합니다." },
+    { name: "발표이", desc: "모둠의 의견을 대표로 발표합니다." },
+    { name: "칭찬이", desc: "친구들의 장점을 찾아 칭찬해줍니다." }
 ];
 
 function rollDice() {
@@ -264,33 +276,50 @@ function rollDice() {
     const resultBox = document.getElementById('role-result');
     resultBox.classList.add('hidden');
     resultBox.classList.remove('active');
+
+    // Add spinning class
     cube.classList.add('is-spinning');
 
+    // Simulate thinking/rolling time
     setTimeout(() => {
         cube.classList.remove('is-spinning');
+
+        // Pick random role
         const randomIndex = Math.floor(Math.random() * roles.length);
         const selectedRole = roles[randomIndex];
+
+        // Apply a random final rotation (CSS) to make it look like it landed
         const xRand = Math.floor(Math.random() * 4) * 90;
         const yRand = Math.floor(Math.random() * 4) * 90;
-        cube.style.transform = \	ranslateZ(-150px) rotateX(\deg) rotateY(\deg) \;
+        cube.style.transform = `translateZ(-150px) rotateX(${xRand}deg) rotateY(${yRand}deg)`;
+
+        // Show result
         document.getElementById('role-name').textContent = selectedRole.name;
         document.getElementById('role-desc').textContent = selectedRole.desc;
+
         setTimeout(() => {
             resultBox.classList.remove('hidden');
-            resultBox.classList.add('active');
+            resultBox.classList.add('active'); // Re-trigger fadeUp
             isSpinning = false;
-        }, 500);
-    }, 2000);
+        }, 500); // Small delay after stop
+
+    }, 2000); // Spin for 2 seconds
 }
 
 function resetDice() {
+    // Hide result
     const resultBox = document.getElementById('role-result');
     resultBox.classList.add('hidden');
+
+    // Reset cube position
     cube.style.transform = 'translateZ(-150px) rotateX(0deg) rotateY(0deg)';
+
+    // Reset internal state if needed
     isSpinning = false;
 }
 
-// Roulette Logic
+
+/* Roulette Logic */
 let currentRotation = 0;
 
 function spinRoulette() {
@@ -298,29 +327,37 @@ function spinRoulette() {
     const resultDiv = document.getElementById('roulette-result');
     const winnerText = document.getElementById('roulette-winner');
 
+    // Hide previous result
     resultDiv.classList.add('hidden');
     resultDiv.classList.remove('active');
 
+    // Calculate random spin
+    // Minimum 5 full spins (1800 deg) + random angle
     const randomDegree = Math.floor(Math.random() * 360);
     const extraSpins = 360 * 5;
     const totalRotation = currentRotation + extraSpins + randomDegree;
 
+    // Rotate
     wheel.style.transform = 'rotate(' + totalRotation + 'deg)';
     currentRotation = totalRotation;
 
+    // Determine winner after animation (3s)
     setTimeout(() => {
         const actualDeg = totalRotation % 360;
         const effectiveAngle = (360 - actualDeg) % 360;
-        const segmentSize = 72;
+        const segmentSize = 72; // 360 / 5
+
         const winningIndex = Math.floor(effectiveAngle / segmentSize);
-        // winningIndex 0 -> Segment 1...
+        // winningIndex 0 -> Segment 1
 
         const items = ['손님모셔오기', '이런 사람 일어나', '유령기차', '릴레이 박수', '가가볼'];
+        // Note: The segments are rendered in order 1..5.
+
         const winner = items[winningIndex];
 
         winnerText.textContent = winner;
         resultDiv.classList.remove('hidden');
-        resultDiv.classList.add('active');
+        resultDiv.classList.add('active'); // Reuse active animation
 
     }, 3000);
 }
@@ -330,4 +367,3 @@ function resetRoulette() {
     resultDiv.classList.add('hidden');
     spinRoulette();
 }
-
