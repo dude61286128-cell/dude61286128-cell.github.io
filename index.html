@@ -135,9 +135,15 @@
     <script src="script.js"></script>
     <script>
         function switchToGame() {
-            // Trigger a click on the Game tab button
-            const gameTabBtn = document.querySelector('.tab-btn[data-tab="game"]');
-            if (gameTabBtn) gameTabBtn.click();
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            // document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); // content links only now
+
+            // Show game tab
+            const gameTab = document.getElementById('game');
+            if (gameTab) {
+                gameTab.classList.add('active');
+            }
         }
 
         function openTool1() {
