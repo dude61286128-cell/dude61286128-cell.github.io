@@ -191,6 +191,7 @@
         }
 
         function goHome() {
+            if (typeof stopMusic === 'function') stopMusic();
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             const homeTab = document.getElementById('home');
             if (homeTab) {
@@ -199,6 +200,7 @@
         }
 
         function openTool1() {
+            if (typeof stopMusic === 'function') stopMusic();
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             // Show tool1
@@ -210,6 +212,7 @@
         }
 
         function openTool2() {
+            if (typeof stopMusic === 'function') stopMusic();
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             // Show tool2
