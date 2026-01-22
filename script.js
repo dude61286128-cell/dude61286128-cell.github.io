@@ -1,6 +1,10 @@
 ﻿// Tab Switching Logic
 document.querySelectorAll('.tab-btn').forEach(button => {
     button.addEventListener('click', () => {
+        // Stop any game music if leaving game tab (though this listener is for main tabs logic)
+        // If we have a global stopMusic, call it just in case.
+        if (typeof stopMusic === 'function') stopMusic();
+
         // Remove active class from all buttons and contents
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -13,6 +17,8 @@ document.querySelectorAll('.tab-btn').forEach(button => {
         document.getElementById(tabId).classList.add('active');
     });
 });
+
+
 
 // Tetris Game Logic
 const board = document.getElementById('game-board');
@@ -198,6 +204,34 @@ function checkLines() {
 
 // Sound Context
 let audioCtx;
+const NOTES = {
+    'B3': 246.94, 'C4': 261.63, 'C#4': 277.18, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23,
+    'F#4': 369.99, 'G4': 392.00, 'G#4': 415.30, 'A4': 440.00, 'B4': 493.88, 'C5': 523.25,
+    'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99, 'A5': 880.00
+};
+
+// Korobeiniki Theme
+const THEME_MELODY = [
+    { note: 'E5', dur: 0.5 }, { note: 'B4', dur: 0.25 }, { note: 'C5', dur: 0.25 }, { note: 'D5', dur: 0.5 },
+    { note: 'C5', dur: 0.25 }, { note: 'B4', dur: 0.25 }, { note: 'A4', dur: 0.5 }, { note: 'A4', dur: 0.25 },
+    { note: 'C5', dur: 0.25 }, { note: 'E5', dur: 0.5 }, { note: 'D5', dur: 0.25 }, { note: 'C5', dur: 0.25 },
+    { note: 'B4', dur: 0.75 }, { note: 'C5', dur: 0.25 }, { note: 'D5', dur: 0.5 }, { note: 'E5', dur: 0.5 },
+    { note: 'C5', dur: 0.5 }, { note: 'A4', dur: 0.5 }, { note: 'A4', dur: 0.5 }, // End part A
+
+    // Part B (repeat or secondary phrase, simplified for loop)
+    { note: 'D5', dur: 0.5 }, { note: 'F5', dur: 0.25 }, { note: 'A5', dur: 0.5 }, { note: 'G5', dur: 0.25 },
+    { note: 'F5', dur: 0.25 }, { note: 'E5', dur: 0.75 }, { note: 'C5', dur: 0.25 }, { note: 'E5', dur: 0.5 },
+    { note: 'D5', dur: 0.25 }, { note: 'C5', dur: 0.25 }, { note: 'B4', dur: 0.5 }, { note: 'B4', dur: 0.25 },
+    { note: 'C5', dur: 0.25 }, { note: 'D5', dur: 0.5 }, { note: 'E5', dur: 0.5 }, { note: 'C5', dur: 0.5 },
+    { note: 'A4', dur: 0.5 }, { note: 'A4', dur: 0.5 }
+];
+
+let musicOscillators = [];
+let nextNoteTime = 0;
+let noteIndex = 0;
+let isMusicPlaying = false;
+let musicInterval;
+
 function initAudio() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -205,6 +239,70 @@ function initAudio() {
     if (audioCtx.state === 'suspended') {
         audioCtx.resume();
     }
+}
+
+function playTone(freq, duration, startTime) {
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    osc.type = 'square'; // 8-bit sound
+    osc.frequency.value = freq;
+
+    gainNode.gain.value = 0.05; // Low background volume
+    gainNode.gain.setValueAtTime(0.05, startTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration - 0.05);
+
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    osc.start(startTime);
+    osc.stop(startTime + duration);
+
+    musicOscillators.push(osc);
+    // Cleanup
+    setTimeout(() => {
+        const idx = musicOscillators.indexOf(osc);
+        if (idx > -1) musicOscillators.splice(idx, 1);
+    }, duration * 1000 + 100);
+}
+
+function stopMusic() {
+    isMusicPlaying = false;
+    clearInterval(musicInterval);
+    musicOscillators.forEach(osc => {
+        try { osc.stop(); } catch (e) { }
+    });
+    musicOscillators = [];
+}
+
+function scheduler() {
+    const lookahead = 0.1; // seconds
+    while (nextNoteTime < audioCtx.currentTime + lookahead) {
+        const noteData = THEME_MELODY[noteIndex];
+
+        let freq = NOTES[noteData.note];
+
+        if (freq) {
+            playTone(freq, noteData.dur * 0.45, nextNoteTime); // 0.45 tempo scaling
+        }
+
+        // Advance time
+        nextNoteTime += noteData.dur * 0.45;
+
+        noteIndex++;
+        if (noteIndex >= THEME_MELODY.length) {
+            noteIndex = 0;
+        }
+    }
+}
+
+function startMusic() {
+    if (isMusicPlaying) return;
+    initAudio();
+    isMusicPlaying = true;
+    noteIndex = 0;
+    nextNoteTime = audioCtx.currentTime;
+    musicInterval = setInterval(scheduler, 25);
 }
 
 function playExplosionSound() {
@@ -286,6 +384,7 @@ function createExplosion(x, y, colorClass) {
 }
 
 function gameOver() {
+    stopMusic();
     clearInterval(gameInterval);
     alert('Game Over! Score: ' + score);
     startBtn.disabled = false;
@@ -302,6 +401,7 @@ function gameLoop() {
 }
 
 function startGame() {
+    startMusic();
     grid = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
     score = 0;
     level = 1;
