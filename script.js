@@ -163,20 +163,26 @@ function checkLines() {
     let linesCleared = 0;
     for (let y = ROWS - 1; y >= 0; y--) {
         if (grid[y].every(cell => cell !== 0)) {
+            // Capture row colors before removing
+            const rowColors = [...grid[y]];
+
             // Remove line
             grid.splice(y, 1);
             // Add new empty line at top
             grid.unshift(Array(COLS).fill(0));
             linesCleared++;
-            y++; // Check same row index again as lines shifted down
 
-            // Explosion effect for cleared line
-            createExplosion(y * BLOCK_SIZE);
-            playExplosionSound();
+            // Explosion effect per block
+            rowColors.forEach((color, x) => {
+                createExplosion(x * BLOCK_SIZE, y * BLOCK_SIZE, color);
+            });
+
+            y++; // Check same row index again
         }
     }
     if (linesCleared > 0) {
-        score += linesCleared * 100 * linesCleared; // Bonus for multiple lines
+        playExplosionSound(); // Play sound once per clear check, or per line? Let's play once for clearer audio.
+        score += linesCleared * 100 * linesCleared;
         scoreElement.textContent = score;
         if (score > level * 500) {
             level++;
@@ -201,53 +207,75 @@ function initAudio() {
 function playExplosionSound() {
     if (!audioCtx) initAudio();
 
-    const oscillators = [];
-    const gainNode = audioCtx.createGain();
-    gainNode.connect(audioCtx.destination);
+    // Create white noise buffer
+    const bufferSize = audioCtx.sampleRate * 0.5; // 0.5 seconds
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
 
-    // Create a noise-like effect using multiple oscillators
-    for (let i = 0; i < 3; i++) {
-        const osc = audioCtx.createOscillator();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(100 + Math.random() * 200, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-        osc.connect(gainNode);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.3);
-        oscillators.push(osc);
+    for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
     }
 
-    // Gain envelope for "impact"
-    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+
+    // Filter for "crunch/shatter" (Highpass)
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.value = 1000;
+
+    const gainNode = audioCtx.createGain();
+
+    // Connect graph
+    noise.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    // Play with envelope
+    const now = audioCtx.currentTime;
+    gainNode.gain.setValueAtTime(0.2, now); // Quieter volume (0.2)
+    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15); // Quick decay for "snap"
+
+    noise.start(now);
+    noise.stop(now + 0.2);
 }
 
-function createExplosion(yPos) {
-    // Enhanced particle effect
-    for (let i = 0; i < 50; i++) { // More particles
+function createExplosion(x, y, colorClass) {
+    // Determine color from class
+    // We can map the class string "type-I" to actual hex color or use computed style,
+    // but hardcoding the map is faster and safer for particles.
+    const colorMap = {
+        'type-I': '#00f0f0', 'type-O': '#f0f000', 'type-T': '#a000f0',
+        'type-S': '#00f000', 'type-Z': '#f00000', 'type-J': '#0000f0', 'type-L': '#f0a000'
+    };
+    const baseColor = colorMap[colorClass] || '#fff';
+
+    // Block shatter effect
+    for (let i = 0; i < 8; i++) { // 8 particles per block
         const particle = document.createElement('div');
         particle.classList.add('explosion-particle');
-        particle.style.left = `${Math.random() * 300}px`;
-        particle.style.top = `${yPos + 15}px`; // Center of the block height
+        particle.style.left = `${x + 15}px`; // Start at center of block
+        particle.style.top = `${y + 15}px`;
 
-        // Random bright colors
-        const hue = Math.floor(Math.random() * 360);
-        particle.style.background = `hsl(${hue}, 100%, 70%)`;
-        particle.style.boxShadow = `0 0 10px hsl(${hue}, 100%, 70%)`; // Glow
+        particle.style.background = baseColor;
+        particle.style.borderRadius = '0'; // Square shards
 
         // Explosive spread
         const angle = Math.random() * Math.PI * 2;
-        const velocity = 50 + Math.random() * 150;
+        const velocity = 30 + Math.random() * 80;
         const tx = Math.cos(angle) * velocity;
         const ty = Math.sin(angle) * velocity;
 
         particle.style.setProperty('--tx', `${tx}px`);
         particle.style.setProperty('--ty', `${ty}px`);
 
-        // Random size
-        const size = 4 + Math.random() * 6;
+        // Random size shards
+        const size = 3 + Math.random() * 5;
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
+
+        // Small rotation
+        particle.style.transform = `rotate(${Math.random() * 360}deg)`;
 
         board.appendChild(particle);
         setTimeout(() => particle.remove(), 800);
