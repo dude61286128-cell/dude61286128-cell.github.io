@@ -664,10 +664,11 @@ main {
 }
 
 .role-result p {
-    font-size: 1.8rem;
-    /* Increased size */
+    font-size: 4rem;
+    /* Significantly Increased size */
     margin-bottom: 30px;
-    color: #555;
+    color: var(--accent-color);
+    font-weight: bold;
 }
 
 .retry-btn {

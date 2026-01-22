@@ -361,7 +361,7 @@ function spinRoulette() {
         resultDiv.classList.remove('hidden');
         resultDiv.classList.add('active'); // Reuse active animation
 
-    }, 3000);
+    }, 4000);
 }
 
 function resetRoulette() {
