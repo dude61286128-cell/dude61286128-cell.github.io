@@ -260,13 +260,13 @@ document.addEventListener('keydown', (e) => {
 // Role Dice Tool Logic
 let isSpinning = false;
 const cube = document.querySelector('.cube');
-// Updated roles based on user input for Roulette (assuming these are the intended "1in1roles")
 const roles = [
-    { name: "손님모셔오기", desc: "즐거운 교실놀이입니다." },
-    { name: "이런 사람 일어나", desc: "즐거운 교실놀이입니다." },
-    { name: "유령기차", desc: "즐거운 교실놀이입니다." },
-    { name: "릴레이 박수", desc: "즐거운 교실놀이입니다." },
-    { name: "가가볼", desc: "즐거운 교실놀이입니다." }
+    { name: "교실 쓸기", desc: "깨끗한 교실을 위해 바닥을 쓸어주세요." },
+    { name: "쓰레기통 비우기", desc: "쓰레기통이 가득 차면 비워주세요." },
+    { name: "창문열기", desc: "환기를 위해 창문을 열고 닫아주세요." },
+    { name: "책상 줄 맞추기", desc: "책상과 의자 줄을 바르게 정리해주세요." },
+    { name: "칠판 닦기", desc: "수업이 끝나면 칠판을 깨끗이 지워주세요." },
+    { name: "청소함 정리", desc: "청소도구를 가지런히 정리해주세요." }
 ];
 
 function rollDice() {
