@@ -181,7 +181,7 @@ function createExplosion(yPos) {
         particle.classList.add('explosion-particle');
         particle.style.left = \\px\;
         particle.style.top = \\px\;
-        particle.style.background = \hsl(\, 100%, 50%)\;
+        particle.style.background = \hsl(\, 100 %, 50 %) \;
         particle.style.setProperty('--tx', \\px\);
         particle.style.setProperty('--ty', \\px\);
         board.appendChild(particle);
@@ -260,7 +260,7 @@ const roles = [
 function rollDice() {
     if (isSpinning) return;
     isSpinning = true;
-    
+
     const resultBox = document.getElementById('role-result');
     resultBox.classList.add('hidden');
     resultBox.classList.remove('active');
@@ -272,7 +272,7 @@ function rollDice() {
         const selectedRole = roles[randomIndex];
         const xRand = Math.floor(Math.random() * 4) * 90;
         const yRand = Math.floor(Math.random() * 4) * 90;
-        cube.style.transform = \	ranslateZ(-150px) rotateX(\deg) rotateY(\deg)\;
+        cube.style.transform = \	ranslateZ(-150px) rotateX(\deg) rotateY(\deg) \;
         document.getElementById('role-name').textContent = selectedRole.name;
         document.getElementById('role-desc').textContent = selectedRole.desc;
         setTimeout(() => {
@@ -297,32 +297,32 @@ function spinRoulette() {
     const wheel = document.getElementById('roulette-wheel');
     const resultDiv = document.getElementById('roulette-result');
     const winnerText = document.getElementById('roulette-winner');
-    
+
     resultDiv.classList.add('hidden');
     resultDiv.classList.remove('active');
 
     const randomDegree = Math.floor(Math.random() * 360);
-    const extraSpins = 360 * 5; 
+    const extraSpins = 360 * 5;
     const totalRotation = currentRotation + extraSpins + randomDegree;
-    
+
     wheel.style.transform = 'rotate(' + totalRotation + 'deg)';
     currentRotation = totalRotation;
 
     setTimeout(() => {
         const actualDeg = totalRotation % 360;
         const effectiveAngle = (360 - actualDeg) % 360;
-        const segmentSize = 72; 
+        const segmentSize = 72;
         const winningIndex = Math.floor(effectiveAngle / segmentSize);
         // winningIndex 0 -> Segment 1...
-        
+
         const items = ['손님모셔오기', '이런 사람 일어나', '유령기차', '릴레이 박수', '가가볼'];
         const winner = items[winningIndex];
 
         winnerText.textContent = winner;
         resultDiv.classList.remove('hidden');
-        resultDiv.classList.add('active'); 
-        
-    }, 5000);
+        resultDiv.classList.add('active');
+
+    }, 3000);
 }
 
 function resetRoulette() {

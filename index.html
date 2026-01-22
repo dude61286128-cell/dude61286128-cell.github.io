@@ -160,7 +160,7 @@
 
             <div class="roulette-container">
                 <div class="pointer"></div>
-                <div class="roulette-wheel" id="roulette-wheel" onclick="spinRoulette()">
+                <div class="roulette-wheel" id="roulette-wheel">
                     <div class="segment" style="--i:1; --clr:#FF6384;"><span>손님모셔오기</span></div>
                     <div class="segment" style="--i:2; --clr:#36A2EB;"><span>이런 사람 일어나</span></div>
                     <div class="segment" style="--i:3; --clr:#FFCE56;"><span>유령기차</span></div>
@@ -168,6 +168,8 @@
                     <div class="segment" style="--i:5; --clr:#9966FF;"><span>가가볼</span></div>
                 </div>
             </div>
+
+            <button class="play-btn" style="margin-top: 20px;" onclick="spinRoulette()">돌리기</button>
 
             <div id="roulette-result" class="role-result hidden">
                 <h3>당첨!</h3>
