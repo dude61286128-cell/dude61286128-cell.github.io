@@ -57,7 +57,7 @@
                     <div class="card-content">
                         <h3>학급도구1</h3>
                         <p>학급 운영을 위한 유용한 도구입니다.</p>
-                        <button class="play-btn" onclick="alert('준비 중입니다!')">실행</button>
+                        <button class="play-btn" onclick="openTool1()">실행</button>
                     </div>
                 </div>
 
@@ -122,12 +122,52 @@
         </div>
     </main>
 
+    <!-- CLASS TOOL 1 SECTION (Role Dice) -->
+    <div id="tool1" class="tab-content">
+        <div class="tool-wrapper">
+            <button class="back-btn" onclick="document.querySelector('[data-tab=\'home\']').click()">← Back to
+                Home</button>
+            <h2>Class Role Dice</h2>
+            <p>Click the cube to assign a role!</p>
+
+            <div class="scene">
+                <div class="cube" onclick="rollDice()">
+                    <div class="cube__face cube__face--front">?</div>
+                    <div class="cube__face cube__face--back">?</div>
+                    <div class="cube__face cube__face--right">?</div>
+                    <div class="cube__face cube__face--left">?</div>
+                    <div class="cube__face cube__face--top">?</div>
+                    <div class="cube__face cube__face--bottom">?</div>
+                </div>
+            </div>
+
+            <div id="role-result" class="role-result hidden">
+                <h3 id="role-name"></h3>
+                <p id="role-desc"></p>
+                <button class="retry-btn" onclick="resetDice()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
     <script>
         function switchToGame() {
             // Trigger a click on the Game tab button
             const gameTabBtn = document.querySelector('.tab-btn[data-tab="game"]');
             if (gameTabBtn) gameTabBtn.click();
+        }
+
+        function openTool1() {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            // Show tool1
+            const tool1 = document.getElementById('tool1');
+            if (tool1) {
+                tool1.classList.add('active');
+                resetDice(); // Reset state when opening
+            }
         }
     </script>
 </body>

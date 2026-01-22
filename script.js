@@ -369,4 +369,60 @@ tabs.forEach(tab => {
     });
 });
 
+// --- Role Dice Logic ---
+const roles = [
+    { name: '교실쓸기', desc: '빗자루를 들고 교실 바닥을 깨끗이 쓸어주세요.' },
+    { name: '교실환기하기', desc: '창문을 열어 신선한 공기가 들어오게 해주세요.' },
+    { name: '쓰레기통 비우기', desc: '쓰레기통이 가득 찼다면 비워주세요.' },
+    { name: '책상 줄 맞추기', desc: '친구들의 책상이 삐뚤어지지 않게 정리해주세요.' },
+    { name: '칠판 닦기', desc: '수업이 끝나면 칠판을 깨끗하게 지워주세요.' }
+];
+
+let isRolling = false;
+
+function rollDice() {
+    if (isRolling) return;
+    isRolling = true;
+
+    const cube = document.querySelector('.cube');
+    const resultDiv = document.getElementById('role-result');
+    
+    // Hide previous result
+    resultDiv.classList.add('hidden');
+
+    // Start spinning
+    cube.classList.add('is-spinning');
+
+    // Wait for spin (random time between 2-3 seconds for effect)
+    setTimeout(() => {
+        cube.classList.remove('is-spinning');
+        
+        // Random rotation to stop at
+        // To make it look like it landed on a side, we'd need complex math or just snap to a side.
+        // For simplicity, we'll just stop spinning and show the result overlay.
+        
+        pickRole();
+        isRolling = false;
+    }, 2000);
+}
+
+function pickRole() {
+    const randomRole = roles[Math.floor(Math.random() * roles.length)];
+    
+    const nameEl = document.getElementById('role-name');
+    const descEl = document.getElementById('role-desc');
+    const resultDiv = document.getElementById('role-result');
+
+    nameEl.textContent = randomRole.name;
+    descEl.textContent = randomRole.desc;
+
+    resultDiv.classList.remove('hidden');
+}
+
+function resetDice() {
+    const resultDiv = document.getElementById('role-result');
+    resultDiv.classList.add('hidden');
+    isRolling = false;
+}
+
 init();
