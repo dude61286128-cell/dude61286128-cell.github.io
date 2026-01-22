@@ -172,6 +172,7 @@ function checkLines() {
 
             // Explosion effect for cleared line
             createExplosion(y * BLOCK_SIZE);
+            playExplosionSound();
         }
     }
     if (linesCleared > 0) {
@@ -186,16 +187,68 @@ function checkLines() {
     }
 }
 
+// Sound Context
+let audioCtx;
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+}
+
+function playExplosionSound() {
+    if (!audioCtx) initAudio();
+
+    const oscillators = [];
+    const gainNode = audioCtx.createGain();
+    gainNode.connect(audioCtx.destination);
+
+    // Create a noise-like effect using multiple oscillators
+    for (let i = 0; i < 3; i++) {
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(100 + Math.random() * 200, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.connect(gainNode);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+        oscillators.push(osc);
+    }
+
+    // Gain envelope for "impact"
+    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+}
+
 function createExplosion(yPos) {
-    // Simple particle effect
-    for (let i = 0; i < 20; i++) {
+    // Enhanced particle effect
+    for (let i = 0; i < 50; i++) { // More particles
         const particle = document.createElement('div');
         particle.classList.add('explosion-particle');
         particle.style.left = `${Math.random() * 300}px`;
-        particle.style.top = `${yPos}px`;
-        particle.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
-        particle.style.setProperty('--tx', `${(Math.random() - 0.5) * 100}px`);
-        particle.style.setProperty('--ty', `${(Math.random() - 0.5) * 100}px`);
+        particle.style.top = `${yPos + 15}px`; // Center of the block height
+
+        // Random bright colors
+        const hue = Math.floor(Math.random() * 360);
+        particle.style.background = `hsl(${hue}, 100%, 70%)`;
+        particle.style.boxShadow = `0 0 10px hsl(${hue}, 100%, 70%)`; // Glow
+
+        // Explosive spread
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = 50 + Math.random() * 150;
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+
+        particle.style.setProperty('--tx', `${tx}px`);
+        particle.style.setProperty('--ty', `${ty}px`);
+
+        // Random size
+        const size = 4 + Math.random() * 6;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+
         board.appendChild(particle);
         setTimeout(() => particle.remove(), 800);
     }
