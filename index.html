@@ -70,7 +70,8 @@
 
         <!-- GAME SECTION -->
         <div id="game" class="tab-content">
-            <div class="game-wrapper">
+            <div class="game-wrapper" style="position: relative; width: 100%;">
+                <button class="back-btn" onclick="goHome()">← Back to Home</button>
                 <h2>Classic Tetris</h2>
                 <!-- Existing Game Structure -->
                 <div class="game-container">
@@ -108,8 +109,7 @@
     <!-- CLASS TOOL 1 SECTION (Role Dice) -->
     <div id="tool1" class="tab-content">
         <div class="tool-wrapper">
-            <button class="back-btn" onclick="document.querySelector('[data-tab=\'home\']').click()">← Back to
-                Home</button>
+            <button class="back-btn" onclick="goHome()">← Back to Home</button>
             <h2>1인1역 상자</h2>
             <p>상자를 눌러보세요.</p>
 
@@ -137,12 +137,18 @@
         function switchToGame() {
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            // document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); // content links only now
-
             // Show game tab
             const gameTab = document.getElementById('game');
             if (gameTab) {
                 gameTab.classList.add('active');
+            }
+        }
+
+        function goHome() {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            const homeTab = document.getElementById('home');
+            if (homeTab) {
+                homeTab.classList.add('active');
             }
         }
 
