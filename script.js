@@ -62,7 +62,10 @@ function createPiece() {
 }
 
 function drawBoard() {
-    board.innerHTML = '';
+    // Only remove game blocks, preserve particles
+    const blocks = board.querySelectorAll('.block');
+    blocks.forEach(block => block.remove());
+
     grid.forEach((row, y) => {
         row.forEach((value, x) => {
             if (value) {
